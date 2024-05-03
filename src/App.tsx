@@ -2,6 +2,8 @@ import { useState } from 'react';
 
 import './App.css';
 import { useRef } from 'react';
+import { editorControls } from './controls';
+import { RangeControl } from './input-control';
 
 function downloadImage(image: string, imageFileName: string) {
   const fakeLink = document.createElement('a');
@@ -14,95 +16,10 @@ function downloadImage(image: string, imageFileName: string) {
   fakeLink.remove();
 }
 
-const editorOptions = [{
-  label: 'Brightness',
-  prop: 'brightness',
-  min: 0,
-  max: 5,
-  step: 0.01,
-  value: 1,
-  unit: ''
-}, {
-  label: 'Grayscale',
-  prop: 'grayscale',
-  min: 0,
-  max: 1,
-  step: 0.01,
-  value: 0,
-  unit: ''
-}, {
-  label: 'Saturate',
-  prop: 'Saturate',
-  min: 0,
-  max: 5,
-  step: 0.01,
-  value: 1,
-  unit: ''
-}, {
-  label: 'Sepia',
-  prop: 'sepia',
-  min: 0,
-  max: 1,
-  step: 0.01,
-  value: 0,
-  unit: ''
-}, {
-  label: 'Blur',
-  prop: 'blur',
-  min: 0,
-  max: 5,
-  step: 0.02,
-  value: 0,
-  unit: 'px'
-}]
-
-function Range({
-  value,
-  onChange,
-  label,
-  step = 0.01,
-  min = 0,
-  max = 1,
-}: {
-  label: string;
-  value: number;
-  step?: number;
-  min?: number;
-  max?: number;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div>
-      {label}
-      <input
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-        type="range"
-      />
-      <input
-        value={value}
-        type="number"
-        max={max}
-        min={min}
-        step={step}
-        onChange={(e) => {
-          onChange(e.target.value);
-        }}
-        style={{ width: 50 }}
-      />
-    </div>
-  );
-}
 
 function App() {
   const [r, s] = useState('');
-  // https://www.w3schools.com/cssref/css3_pr_filter.php more filters
-  const [edit, setEdit] = useState(editorOptions);
+  const [edit, setEdit] = useState(editorControls);
   const [fileName, setFileName] = useState('')
 
   console.log(edit)
@@ -172,20 +89,21 @@ function App() {
         edit.map(option => {
           const { label, prop, min, max, step, value } = option
           return (
-            <Range
+            <RangeControl
               key={prop}
               label={label}
               value={value}
               max={max}
               min={min}
               step={step}
+              disabled={!r}
               onChange={(newValue) => {
                 setEdit(prev => {
                   return prev.map(o => {
                     if (o.prop === option.prop) {
                       return {
                         ...o,
-                        value: Number(newValue)
+                        value: (newValue)
                       }
                     }
                     return o
