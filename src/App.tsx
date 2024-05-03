@@ -14,6 +14,48 @@ function downloadImage(image: string, imageFileName: string) {
   fakeLink.remove();
 }
 
+const editorOptions = [{
+  label: 'Brightness',
+  prop: 'brightness',
+  min: 0,
+  max: 5,
+  step: 0.01,
+  value: 1,
+  unit: ''
+}, {
+  label: 'Grayscale',
+  prop: 'grayscale',
+  min: 0,
+  max: 1,
+  step: 0.01,
+  value: 0,
+  unit: ''
+}, {
+  label: 'Saturate',
+  prop: 'Saturate',
+  min: 0,
+  max: 5,
+  step: 0.01,
+  value: 1,
+  unit: ''
+}, {
+  label: 'Sepia',
+  prop: 'sepia',
+  min: 0,
+  max: 1,
+  step: 0.01,
+  value: 0,
+  unit: ''
+}, {
+  label: 'Blur',
+  prop: 'blur',
+  min: 0,
+  max: 5,
+  step: 0.02,
+  value: 0,
+  unit: 'px'
+}]
+
 function Range({
   value,
   onChange,
@@ -60,14 +102,16 @@ function Range({
 function App() {
   const [r, s] = useState('');
   // https://www.w3schools.com/cssref/css3_pr_filter.php more filters
-  const [edit, setEdit] = useState({
-    brightness: 1,
-    grayscale: 0,
-    saturate: 1,
-    sepia: 0,
-  });
+  const [edit, setEdit] = useState(editorOptions);
+
+  console.log(edit)
   const ref = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const filterValue = edit.reduce((acc, option) => {
+    return acc + `${option.prop}(${option.value}${option.unit}) `;
+  }, '')
+
 
   return (
     <>
@@ -104,7 +148,7 @@ function App() {
             src={r}
             alt="minha img"
             style={{
-              filter: `brightness(${edit.brightness}) grayscale(${edit.grayscale}) saturate(${edit.saturate}) sepia(${edit.sepia})`,
+              filter: filterValue,
             }}
             id="my-img"
             onLoad={(e) => {
@@ -120,26 +164,39 @@ function App() {
       </div>
       <hr />
 
-      {['brightness', 'grayscale', 'saturate', 'sepia'].map((io) => {
-        const key = io as keyof typeof edit;
-        return (
-          <Range
-            key={io}
-            label={io}
-            value={edit[key]}
-            max={5}
-            onChange={(v) => {
-              setEdit((prev) => ({
-                ...prev,
-                [key]: Number(v),
-              }));
-            }}
-          />
-        );
-      })}
+      {
+        edit.map(option => {
+          const { label, prop, min, max, step, value } = option
+          return (
+            <Range
+              key={prop}
+              label={label}
+              value={value}
+              max={max}
+              min={min}
+              step={step}
+              onChange={(newValue) => {
+                setEdit(prev => {
+                  return prev.map(o => {
+                    if (o.prop === option.prop) {
+                      return {
+                        ...o,
+                        value: Number(newValue)
+                      }
+                    }
+                    return o
+                  })
+                })
+              }}
+            />
+          )
+        })
+      }
+
 
       <canvas ref={canvasRef} style={{ display: 'none' }} id="img"></canvas>
 
+      {filterValue}
       <hr />
       <button
         onClick={() => {
@@ -147,11 +204,10 @@ function App() {
           var canvas = document.getElementById('img') as HTMLCanvasElement;
           var ctx = canvas.getContext('2d');
           if (ctx) {
-            ctx.filter = `brightness(${edit.brightness}) grayscale(${edit.grayscale}) saturate(${edit.saturate}) sepia(${edit.sepia})`;
+            ctx.filter = filterValue;
             var img = document.getElementById('my-img') as HTMLImageElement;
 
             if (img) {
-              // TODO put image size
               ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
             }
 
