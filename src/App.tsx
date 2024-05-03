@@ -103,6 +103,7 @@ function App() {
   const [r, s] = useState('');
   // https://www.w3schools.com/cssref/css3_pr_filter.php more filters
   const [edit, setEdit] = useState(editorOptions);
+  const [fileName, setFileName] = useState('')
 
   console.log(edit)
   const ref = useRef<HTMLDivElement>(null);
@@ -126,7 +127,10 @@ function App() {
           if (e.target.files?.length) {
             const file = new FileReader();
 
-            console.log(e.target.files[0]);
+            const fileInput = e.target.files[0]
+
+            setFileName(fileInput.name)
+
 
             file.onload = (ev) => {
               console.log(ev);
@@ -213,7 +217,7 @@ function App() {
 
             const result = canvas.toDataURL('image/jpeg');
 
-            downloadImage(result, 'new image');
+            downloadImage(result, fileName || 'new image');
           }
         }}
       >
