@@ -199,6 +199,7 @@ function App() {
       {filterValue}
       <hr />
       <button
+        disabled={!r}
         onClick={() => {
           // TODO canvas ref
           var canvas = document.getElementById('img') as HTMLCanvasElement;
