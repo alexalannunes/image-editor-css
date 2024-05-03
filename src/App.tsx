@@ -196,7 +196,6 @@ function App() {
 
       <canvas ref={canvasRef} style={{ display: 'none' }} id="img"></canvas>
 
-      {filterValue}
       <hr />
       <button
         disabled={!r}
